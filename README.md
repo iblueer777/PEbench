@@ -32,7 +32,7 @@ Three publicly available datasets provide pixel-level PE annotations on CTPA:
 Each was produced independently, by different teams, for different purposes, and under its own annotation convention. The conventions differ in ways that are entirely reasonable in isolation but that do not coincide across datasets: whether subsegmental lesions are included, how the thrombus–contrast interface is drawn, how partial-volume voxels at vessel margins are assigned, and whether delineation was fully manual or semi-automatic. The consequence is practical rather than critical — a model trained on one dataset is evaluated against a different definition of the target when tested on another, and reported numbers from different papers are not on a common scale.
 
 <p align="center">
-  <img src="s2_error_type.png" width="90%">
+  <img src="assets/s2_error_type.png" width="90%">
 </p>
 <p align="center">
   <em>Representative regions where the original public annotation and the re-annotation under the unified protocol differ: extension into the opacified arterial lumen or adjacent veins, internal voids within an annotated clot, and lesions present on the image but absent from the mask.</em>
