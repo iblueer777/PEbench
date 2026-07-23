@@ -22,13 +22,14 @@ Two resources accompany the paper:
 
 Three publicly available datasets provide pixel-level PE annotations on CTPA:
 
-| Dataset | Cases (raw) | Source |
-|---|---|---|
-
-| CAD-PE | 91 | Gonzalez Serrano G. *CAD-PE*. IEEE Dataport, 2019. [DOI](https://doi.org/10.21227/9bw7-6823) |
-| FUMPE | 35 | Masoudi M, et al. *Sci Data* 2018;5:180180. [DOI](https://doi.org/10.1038/sdata.2018.180) |
-| READ | 40 | de Andrade JMC, et al. *Sci Data* 2023;10:518. [DOI](https://doi.org/10.1038/s41597-023-02374-x) |
-
+| Dataset | Cases released | Cases in FairPE | Source |
+|---|---|---|---|
+| CAD-PE | 91 | 76 | Gonzalez Serrano G. *CAD-PE*. IEEE Dataport, 2019. [DOI](https://doi.org/10.21227/9bw7-6823) |
+| FUMPE | 35 | 33 | Masoudi M, et al. *Sci Data* 2018;5:180180. [DOI](https://doi.org/10.1038/sdata.2018.180) |
+| READ | 40 | 40 | de Andrade JMC, et al. *Sci Data* 2023;10:518. [DOI](https://doi.org/10.1038/s41597-023-02374-x) |
+| **Total** | **166** | **149** | |
+ 
+Seventeen cases were excluded before re-annotation: no PE visible on CTPA, reconstructed slice interval ≥ 3 mm, or artefacts severe enough that no rater could delineate the scan. The excluded case IDs are listed in the release.
 Each was produced independently, by different teams, for different purposes, and under its own annotation convention. The conventions differ in ways that are entirely reasonable in isolation but that do not coincide across datasets: whether subsegmental lesions are included, how the thrombus–contrast interface is drawn, how partial-volume voxels at vessel margins are assigned, and whether delineation was fully manual or semi-automatic. The consequence is practical rather than critical — a model trained on one dataset is evaluated against a different definition of the target when tested on another, and reported numbers from different papers are not on a common scale.
 
 <p align="center">
