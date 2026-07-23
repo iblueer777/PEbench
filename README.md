@@ -242,36 +242,52 @@ Segmentation quality is reported across **four complementary dimensions**.
 
 Dice similarity coefficient, from binary predictions:
 
-$$\mathrm{DSC} = \frac{2\,TP}{2\,TP + FP + FN}$$
+$$
+\mathrm{DSC} = \frac{2 \cdot TP}{2 \cdot TP + FP + FN}
+$$
 
 ### 📏 Boundary accuracy
 
 **ASSD** — the mean bidirectional surface distance in millimetres, where $\partial P$ and $\partial G$ are the predicted and reference surface point sets and $d(\cdot,\cdot)$ the minimum Euclidean point-to-surface distance:
 
-$$\mathrm{ASSD} = \frac{1}{2}\left(\frac{1}{|\partial P|}\sum_{p \in \partial P} d(p, \partial G) + \frac{1}{|\partial G|}\sum_{g \in \partial G} d(g, \partial P)\right)$$
+$$
+\mathrm{ASSD} = \frac{1}{2}\left(\frac{1}{\lvert \partial P \rvert}\sum_{p \in \partial P} d(p, \partial G) + \frac{1}{\lvert \partial G \rvert}\sum_{g \in \partial G} d(g, \partial P)\right)
+$$
 
 **NSD** — the proportion of surface points on each side lying within tolerance $\tau$ of the opposing surface, averaged bidirectionally:
 
-$$\mathrm{NSD}(\tau) = \frac{1}{2}\left(\frac{|\{p \in \partial P : d(p,\partial G) \le \tau\}|}{|\partial P|} + \frac{|\{g \in \partial G : d(g,\partial P) \le \tau\}|}{|\partial G|}\right)$$
+$$
+\mathrm{NSD}(\tau) = \frac{1}{2}\left(\frac{\lvert \lbrace p \in \partial P : d(p,\partial G) \le \tau \rbrace \rvert}{\lvert \partial P \rvert} + \frac{\lvert \lbrace g \in \partial G : d(g,\partial P) \le \tau \rbrace \rvert}{\lvert \partial G \rvert}\right)
+$$
 
 > 💡 The default tolerance is $\tau = 1$ mm, chosen to sit near the centre of the observed inter-rater ASSD range so that the metric separates boundary error from disagreement already present between experts.
 
 ### 🧪 Volumetric agreement
 
-Absolute volume error, $\mathrm{AbsErr} = |V_{\text{pred}} - V_{\text{gt}}|$, from voxel counts scaled by voxel volume (mL).
+Absolute volume error, from voxel counts scaled by voxel volume (mL):
+
+$$
+\mathrm{AbsErr} = \lvert V_{\mathrm{pred}} - V_{\mathrm{gt}} \rvert
+$$
 
 ### 🎯 Lesion-level detection
 
-A two-stage, volume-aware framework, evaluated at overlap thresholds $X \in \{1\ \text{pixel},\ 10\%,\ 20\%\}$.
+A two-stage, volume-aware framework, evaluated at overlap thresholds **X = 1 pixel, 10%, 20%**.
 
-1. Each **predicted** embolus is a true positive ($TP_L$) if $|P \cap G| / |P| \ge X$, otherwise a false positive ($FP_L$).
-2. Each **reference** embolus is detected if its overlap with $TP_L$ components satisfies $|P \cap G| / |G| \ge X$, otherwise a false negative ($FN_L$).
+1. Each **predicted** embolus is a true positive ($TP_L$) if $\lvert P \cap G \rvert / \lvert P \rvert \ge X$, otherwise a false positive ($FP_L$).
+2. Each **reference** embolus is detected if its overlap with $TP_L$ components satisfies $\lvert P \cap G \rvert / \lvert G \rvert \ge X$, otherwise a false negative ($FN_L$).
 
-$$\text{Lesion Precision}(X) = \frac{TP_L}{TP_L + FP_L},\qquad \text{Lesion Recall}(X) = \frac{TP_L}{N_{gt}}$$
+$$
+\text{Lesion Precision}(X) = \frac{TP_L}{TP_L + FP_L}
+\qquad
+\text{Lesion Recall}(X) = \frac{TP_L}{N_{gt}}
+$$
 
 Lesion F1 is defined symmetrically, as the harmonic mean of the two directional recalls:
 
-$$\text{Lesion F1}(X) = \frac{2 \cdot R_{A \to B}(X) \cdot R_{B \to A}(X)}{R_{A \to B}(X) + R_{B \to A}(X)}$$
+$$
+\text{Lesion F1}(X) = \frac{2 \cdot R_{A \to B}(X) \cdot R_{B \to A}(X)}{R_{A \to B}(X) + R_{B \to A}(X)}
+$$
 
 > [!TIP]
 > When $B$ is the reference standard this reduces to the conventional F1. 🤝 The symmetric form lets the same metric be applied to **inter-rater agreement**, where $A$ and $B$ are two raters of equivalent status — useful because voxel-overlap metrics such as DSC are geometrically biased against small lesions and are therefore unreliable as stand-alone agreement measures for PE.
