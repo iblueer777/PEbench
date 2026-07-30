@@ -316,7 +316,7 @@ python evaluate.py \
 <table>
 <tr><td width="80" align="center">⚖️<br><b>FairPE</b></td><td>
 
-The preprocessed CTPA volumes and matched re-annotated PE reference segmentations for all **149 included cases** across CAD-PE, FUMPE and READ, produced under the unified protocol, together with the case-selection list, the annotation protocol, and the **15-case multi-rater subset** with four independent raters and their STAPLE consensus. Distributed via Zenodo with a citable DOI.
+The preprocessed CTPA volumes and matched re-annotated PE reference segmentations for all **149 included cases** across CAD-PE, FUMPE and READ, produced under the unified protocol. Distributed via Zenodo with a citable DOI.
 
 </td></tr>
 <tr><td align="center">🧠<br><b>nnPE</b></td><td>
