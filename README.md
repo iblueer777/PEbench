@@ -316,12 +316,12 @@ python evaluate.py \
 <table>
 <tr><td width="80" align="center">⚖️<br><b>FairPE</b></td><td>
 
-The preprocessed CTPA volumes and matched re-annotated PE reference segmentations for all **149 included cases** across CAD-PE, FUMPE and READ, produced under the unified protocol. Distributed via Zenodo with a citable DOI.
+The preprocessed CTPA volumes and matched re-annotated PE reference segmentations for all **149 included cases** across CAD-PE, FUMPE and READ, produced under the unified protocol. https://zenodo.org/records/21338494 
 
 </td></tr>
 <tr><td align="center">🧠<br><b>nnPE</b></td><td>
 
-nnU-Net 3D ResEncL weights for the pooled (**ABC**) and three leave-one-dataset-out (**AB**, **AC**, **BC**) configurations, five folds each, with the corresponding `splits_final.json` for every configuration.
+nnU-Net 3D ResEncL weights for the pooled (**ABC**) and three leave-one-dataset-out (**AB**, **AC**, **BC**) configurations, five folds each, with the corresponding `splits_final.json` for every configuration. https://zenodo.org/records/21338494
 
 </td></tr>
 <tr><td align="center">💻<br><b>Code</b></td><td>
@@ -419,11 +419,14 @@ Use of `pre_totalseg.py` additionally requires citing **TotalSegmentator**; use 
 <summary>⭐ <b>This work</b></summary>
 
 ```bibtex
-@article{fairpe,
-  title   = {[Title withheld during peer review]},
-  author  = {[Anonymous]},
-  journal = {[Under review]},
-  year    = {2026}
+@misc{sun2026modeleffectlabeleffect,
+      title={Model Effect or Label Effect? Refined Annotations and a Human-Referenced Benchmark for Pulmonary Embolism Segmentation}, 
+      author={Qihang Sun and Zhongxiao Liu and Bailiang Jian and Shenman Qiu and Jingyuan Wang and Lei Zhang and Lixiang Xie and Jiazhen Pan and Christian Wachinger},
+      year={2026},
+      eprint={2608.24486},
+      archivePrefix={arXiv},
+      primaryClass={eess.IV},
+      url={https://arxiv.org/abs/2608.24486}, 
 }
 ```
 
