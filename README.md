@@ -8,15 +8,15 @@
 [![Data: CC BY 4.0](https://img.shields.io/badge/Data-CC%20BY%204.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![nnU-Net](https://img.shields.io/badge/nnU--Net-v2%20ResEncL-orange.svg)](https://github.com/MIC-DKFZ/nnUNet)
-[![Cases](https://img.shields.io/badge/FairPE-149%20cases-red.svg)](#1-background)
-[![Status](https://img.shields.io/badge/Paper-under%20review-lightgrey.svg)](#)
+[![Cases](https://img.shields.io/badge/FairPE-149%20cases-red.svg)](#1--background)
+[![Status](https://img.shields.io/badge/Papers-under%20review-lightgrey.svg)](#)
 
 </div>
 
 ---
 
 > [!IMPORTANT]
-> 🔒 **All resources — labels, weights, splits, and code — will be made public after the paper is accepted.**
+> 🔒 **All resources — labels, weights, splits, and code — will be made public after the papers are accepted.**
 > This repository is a placeholder until then.
 
 ---
@@ -25,25 +25,29 @@
 
 | File | Purpose |
 |:---|:---|
+| 🔄 `convert_public_pe_to_nifti.py` | Convert the three public datasets from their native formats into nnU-Net style NIfTI |
 | 🧩 `pre_totalseg.py` | TotalSegmentator-based lung cropping + nnU-Net v2 raw dataset construction |
+| 🎲 `create_splits.py` | Five-fold splits stratified by source dataset |
 | 📊 `evaluate.py` | Four-dimensional evaluation (voxel / boundary / volumetric / lesion-level) |
+| 📋 `docs/annotation_protocol.md` | The annotation protocol, as applied to all 149 cases |
 
-Two resources accompany the paper:
+Two resources accompany the papers:
 
 | Resource | Description |
 |:---|:---|
-| ⚖️ **FairPE** | All three public pixel-level PE segmentation datasets re-annotated under a single, pre-defined protocol (**149 cases**), released as preprocessed CTPA volumes with matched labels — ready for nnU-Net training. |
-| 🧠 **nnPE** | nnU-Net 3D ResEncL baseline weights trained on the re-annotated labels, released with the exact five-fold splits used in the paper. |
+| ⚖️ **FairPE** | All three public pixel-level PE segmentation datasets annotated under a single, pre-defined protocol (**149 cases**), released as preprocessed CTPA volumes with matched labels — ready for nnU-Net training. |
+| 🧠 **nnPE** | nnU-Net 3D ResEncL baseline weights trained on the harmonized labels, released with the exact five-fold splits used in the paper. |
 
 ---
 
 ## 🗂️ Table of contents
 
 - [1. Background](#1--background)
-- [2. Preprocessing — `pre_totalseg.py`](#2--preprocessing--pre_totalsegpy)
-- [3. Training — nnU-Net 3D ResEncL](#3--training--nnu-net-3d-resencl)
-- [4. Evaluation — `evaluate.py`](#4--evaluation--evaluatepy)
-- [5. Release and citation](#5--release-and-citation)
+- [2. Format conversion — `convert_public_pe_to_nifti.py`](#2--format-conversion--convert_public_pe_to_nifitpy)
+- [3. Preprocessing — `pre_totalseg.py`](#3--preprocessing--pre_totalsegpy)
+- [4. Training — nnU-Net 3D ResEncL](#4--training--nnu-net-3d-resencl)
+- [5. Evaluation — `evaluate.py`](#5--evaluation--evaluatepy)
+- [6. Release and citation](#6--release-and-citation)
 
 ---
 
@@ -51,17 +55,17 @@ Two resources accompany the paper:
 
 Three publicly available datasets provide pixel-level PE annotations on CTPA:
 
-| Dataset | Cases released | Cases in FairPE | Source |
-|:---|:---:|:---:|:---|
-| 🅰️ CAD-PE | 91 | 76 | Gonzalez Serrano G. *CAD-PE*. IEEE Dataport, 2019. · [DOI](https://doi.org/10.21227/9bw7-6823) |
-| 🅱️ FUMPE | 35 | 33 | Masoudi M, et al. *Sci Data* 2018;5:180180. · [DOI](https://doi.org/10.1038/sdata.2018.180) |
-| 🅲 READ | 40 | 40 | de Andrade JMC, et al. *Sci Data* 2023;10:518. · [DOI](https://doi.org/10.1038/s41597-023-02374-x) |
-| **Σ Total** | **166** | **149** | |
+| Dataset | Cases released | Cases in FairPE | Licence | Source |
+|:---|:---:|:---:|:---|:---|
+| 🅰️ CAD-PE | 91 | 76 | IEEE DataPort terms | Gonzalez Serrano G. *CAD-PE*. IEEE DataPort, 2019. · [DOI](https://doi.org/10.21227/9bw7-6823) |
+| 🅱️ FUMPE | 35 | 33 | CC BY 4.0 | Masoudi M, et al. *Sci Data* 2018;5:180180. · [DOI](https://doi.org/10.1038/sdata.2018.180) |
+| 🅲 READ | 40 | 40 | CC0 1.0 | de Andrade JMC, et al. *Sci Data* 2023;10:518. · [DOI](https://doi.org/10.1038/s41597-023-02374-x) |
+| **Σ Total** | **166** | **149** | | |
 
 > [!NOTE]
-> **Seventeen cases were excluded before re-annotation:** no PE visible on CTPA, reconstructed slice interval ≥ 3 mm, or artefacts severe enough that no rater could delineate the scan. The excluded case IDs are listed in the release.
+> **Seventeen cases were excluded before annotation:** no PE visible on CTPA (n = 5), reconstructed slice interval ≥ 3 mm (n = 10), or artefacts severe enough that no rater could delineate the scan (n = 2). The excluded case IDs are listed in the release and in the data descriptor.
 
-### ⚠️ Why re-annotation is needed
+### 📐 Why a single protocol
 
 Each dataset was produced independently, by different teams, for different purposes, and under its own annotation convention. The conventions differ in ways that are entirely reasonable in isolation but that do not coincide across datasets:
 
@@ -70,51 +74,105 @@ Each dataset was produced independently, by different teams, for different purpo
 - 🧱 how **partial-volume voxels** at vessel margins are assigned
 - 🖐️ whether delineation was **fully manual or semi-automatic**
 
-The consequence is practical rather than critical — a model trained on one dataset is evaluated against a different definition of the target when tested on another, and reported numbers from different papers are not on a common scale.
+The consequence is practical rather than critical. A model trained on one dataset is evaluated against a different definition of the target when tested on another, and reported numbers from different papers are not on a common scale.
 
 <p align="center">
   <img src="assets/s2_error_type.png" width="90%">
 </p>
 <p align="center">
-  <em>Representative regions where the original public annotation and the re-annotation under the unified protocol differ: extension into the opacified arterial lumen or adjacent veins, internal voids within an annotated clot, and lesions present on the image but absent from the mask.</em>
+  <em>Representative regions where the source annotation and the harmonized annotation differ: source foreground extending into the opacified arterial lumen or adjacent veins, internal voids within an annotated clot, and emboli present on the image but absent from the source mask.</em>
 </p>
 
-Re-annotating all three datasets under one protocol places them on the same footing. 📋 The protocol used is given in the paper (Supplementary Material S1) and is reproduced in [`docs/annotation_protocol.md`](docs/annotation_protocol.md).
+Annotating all three datasets under one protocol places them on the same footing. 📋 The protocol is reproduced in full in the Methods section of the data descriptor and in [`docs/annotation_protocol.md`](docs/annotation_protocol.md).
 
 ### 🗺️ Spatial distribution of clot burden
 
-The three cohorts also sample different parts of the clinical PE spectrum. The voxel-wise embolus density maps below, computed after registration to a common lung template, show the spatial distribution of clot burden per dataset and pooled:
+The three cohorts also sample different parts of the clinical PE spectrum. The maps below show the spatial distribution of clot burden per dataset and pooled:
 
 <p align="center">
   <img src="assets/pe_density_map.png" width="100%">
 </p>
 <p align="center">
-  <em>Voxel-wise embolus density per dataset and pooled (ALL). Top: anterior view of the lung volume. Middle: medial (mediastinal) surface. Bottom: pulmonary-arterial surface. Color bars encode local voxel count. R/L = right/left lung.</em>
+  <em>Embolus density per dataset and pooled (ALL), after structure-wise mapping into a common reference space. Because image registration is not reliable across these heterogeneous acquisition protocols, coordinates were normalized within the bounding box of each structure rather than registered. Top: anterior view of the lung volume. Middle: medial (mediastinal) surface. Bottom: pulmonary-arterial surface. Colors show <b>relative</b> embolus density on a nonlinear scale (γ = 0.25), with separate scales for the lung lobes and the pulmonary artery, each shared across datasets. Densities are not normalized by cohort size, so datasets should be compared by spatial pattern rather than by overall intensity. R/L = right/left lung.</em>
 </p>
 
 ---
 
-## 2. 🧩 Preprocessing — `pre_totalseg.py`
+## 2. 🔄 Format conversion — `convert_public_pe_to_nifti.py`
 
-Converts raw CT + segmentation label pairs into a lung-cropped [nnU-Net](https://github.com/MIC-DKFZ/nnUNet) v2 raw dataset.
+The three datasets ship in three different formats. This script converts them into a single nnU-Net style NIfTI layout, resolving the orientation and slice-order quirks of each source.
+
+### 📥 Expected raw layout
+
+```
+<raw_root>/
+├── CAD-PE/images/001.nrrd                     + CAD-PE/rs/0001RefStd.nrrd
+├── FUMPE/CT_scans/PAT001/*.dcm                + FUMPE/GroundTruth/PAT001.mat
+└── READ/images/GE (DICOM files)/01GE          + READ/rs/01GE.nii.gz
+    READ/images/TOSHIBA (DICOM files)/01TS     + READ/rs/01TS.nii.gz
+```
+
+### 🧭 What it handles per dataset
+
+| Source | Image | Label | Handling |
+|:---|:---|:---|:---|
+| 🅰️ CAD-PE | NRRD | NRRD (`RefStd`) | The reference stores one value per clot; all non-zero voxels are merged into a single foreground label. |
+| 🅱️ FUMPE | DICOM series | MATLAB `.mat`, key `Mask` | The mask is stored as (y, x, z) and its slices follow the DICOM **file names**, while GDCM sorts slices by **physical position**. The mask is transposed to (z, y, x) and reordered into the image slice order, which reverses it for the cases whose file-name order runs against the position order. |
+| 🅲 READ | DICOM series | NIfTI | The image array and the label array are index-aligned, but their headers disagree on slice direction. The image is written with the geometry of the label header and the voxel spacing of the DICOM tags, the latter being the more precise of the two. |
+
+### 📤 Output
+
+```
+<out>/
+├── imagesTr/<case>_0000.nii.gz    # int16 CT
+└── labelsTr/<case>.nii.gz         # uint8, 0/1
+```
+
+Case naming: CAD-PE `001` → `pe_001_001`, CAD-PE `e0032` → `pe_e0032_e0032`, FUMPE `PAT001` → `pe_Patient01_Patient01`, READ `01GE` → `01GE`. Each stem embeds the identifier used by the source dataset, so every case can be traced back to the file it came from.
+
+### ▶️ Usage
+
+```bash
+python convert_public_pe_to_nifti.py --raw /path/to/raw_root --out /path/to/converted
+python convert_public_pe_to_nifti.py --raw ... --out ... --datasets READ --workers 8
+```
+
+| Flag | Required | Default | Description |
+|:---|:---:|:---:|:---|
+| `--raw` | ✅ | – | Raw data root containing `CAD-PE/`, `FUMPE/`, `READ/` |
+| `--out` | ✅ | – | Output directory (`imagesTr/`, `labelsTr/`) |
+| `--datasets` | ❌ | all three | Subset to convert, e.g. `--datasets READ FUMPE` |
+| `--workers` | ❌ | `4` | Parallel worker processes |
+
+> [!TIP]
+> The run is resumable: cases whose outputs already exist are skipped. ♻️ Shape mismatches and missing labels are reported per case and listed again at the end rather than aborting the run.
+
+---
+
+## 3. 🧩 Preprocessing — `pre_totalseg.py`
+
+Crops CT and label pairs to the thoracic region and builds the nnU-Net v2 raw dataset.
+
+> [!NOTE]
+> This step pairs each CT (`.nii`/`.nii.gz`) with a label in **`.nrrd`**, which is the format exported by 3D Slicer during annotation. Converted volumes from step 2 plus the harmonized masks exported from Slicer are the inputs here. The FairPE release already contains the output of both steps for all 149 cases; the scripts are provided so that new cohorts can be processed identically before training or inference with nnPE.
 
 ### ⚙️ What it does
 
-1. 🔗 Pairs each CT (`.nii`/`.nii.gz`) with its label (`.nrrd`) by matching filename, scanning the input folder recursively.
-2. 🫁 Runs [TotalSegmentator](https://github.com/wasserth/TotalSegmentator) to get a lung mask for each CT.
-3. ✂️ Computes a bounding box around the lungs (with a configurable margin) and crops both the CT and the label to it.
+1. 🔗 Pairs each CT with its label by matching filename, scanning the input folder recursively.
+2. 🫁 Runs [TotalSegmentator](https://github.com/wasserth/TotalSegmentator) (`total` task, fast mode) and merges the lung labels into one mask.
+3. ✂️ Computes a bounding box around that mask, expands it by a configurable margin along each axis, clips it to the volume, and crops both the CT and the label to it, translating the affine accordingly.
 4. 💾 Saves the cropped pairs into `imagesTr/` / `labelsTr/` in nnU-Net naming convention, and generates `dataset.json`.
-5. 📝 Writes `crop_info.json` recording each case's bounding box and foreground voxel counts before/after cropping.
+5. 📝 Writes `crop_info.json` recording each case's bounding box and foreground voxel counts before and after cropping.
 
-> 🎯 **Purpose:** shrink full CT volumes down to just the lung region before nnU-Net training, cutting memory/compute cost while keeping the region of interest (e.g. pulmonary embolism lesions) intact.
+Intensities are kept in Hounsfield units and are not resampled, windowed or normalized.
 
-The FairPE release already contains the output of this step for all 149 cases; the script is provided so that new cohorts can be processed identically before training or inference with nnPE.
+> 🎯 **Purpose:** shrink full CT volumes down to the thoracic region before nnU-Net training, cutting memory and compute cost while keeping the lesions intact.
 
 ### ▶️ Usage
 
 ```bash
 python pre_totalseg.py \
-    -i /path/to/raw_data \
+    -i /path/to/converted_plus_masks \
     -o /path/to/nnUNet_raw \
     --dataset_name Dataset080_3DPECT \
     --margin 10 \
@@ -123,14 +181,14 @@ python pre_totalseg.py \
 
 | Flag | Required | Default | Description |
 |:---|:---:|:---:|:---|
-| `-i`, `--input` | ✅ | – | Root directory of raw `.nii`/`.nii.gz` + `.nrrd` files |
+| `-i`, `--input` | ✅ | – | Root directory of `.nii`/`.nii.gz` + `.nrrd` pairs |
 | `-o`, `--output` | ✅ | – | Output root directory (`nnUNet_raw`) |
 | `--dataset_name` | ✅ | – | Dataset folder name, e.g. `Dataset080_3DPECT` |
-| `--margin` | ❌ | `10` | Voxel margin added around the lung bounding box |
+| `--margin` | ❌ | `10` | Voxel margin added around the bounding box |
 | `-n`, `--n_processes` | ❌ | `4` | Parallel worker processes |
 
 > [!TIP]
-> The script processes one sample first as a **smoke test**, then asks for confirmation before batch-processing the rest. Cases with bad/mismatched files are skipped and reported rather than aborting the run; re-running skips cases already done. ♻️
+> The script processes one case first as a **smoke test**, then asks for confirmation before batch-processing the rest. Cases with bad or mismatched files are skipped and reported rather than aborting the run; re-running skips cases already done. ♻️
 
 ### 📁 Output
 
@@ -151,7 +209,7 @@ nnUNetv2_plan_and_preprocess -d <DATASET_ID> --verify_dataset_integrity
 
 ---
 
-## 3. 🧠 Training — nnU-Net 3D ResEncL
+## 4. 🧠 Training — nnU-Net 3D ResEncL
 
 nnPE uses the nnU-Net v2 residual encoder preset **3D ResEncL** with default configuration, one exception aside (batch size, below). No transfer learning; weights are randomly initialized with the nnU-Net v2 default scheme.
 
@@ -205,7 +263,7 @@ nnUNetv2_predict \
 ```
 
 > [!CAUTION]
-> Inputs **must** be preprocessed with `pre_totalseg.py` first, so that the lung crop matches the training distribution.
+> Inputs **must** be preprocessed with `pre_totalseg.py` first, so that the crop matches the training distribution.
 
 ### 📦 Released configurations
 
@@ -220,7 +278,7 @@ Each configuration ships all five fold checkpoints plus its `splits_final.json`.
 
 ---
 
-## 4. 📊 Evaluation — `evaluate.py`
+## 5. 📊 Evaluation — `evaluate.py`
 
 Segmentation quality is reported across **four complementary dimensions**.
 
@@ -248,7 +306,7 @@ $$
 
 ### 📏 Boundary accuracy
 
-**ASSD** — the mean bidirectional surface distance in millimetres, where $\partial P$ and $\partial G$ are the predicted and reference surface point sets and $d(\cdot,\cdot)$ the minimum Euclidean point-to-surface distance:
+**ASSD** — the mean bidirectional surface distance in millimetres, where $\partial P$ and $\partial G$ are the two surface point sets and $d(\cdot,\cdot)$ the minimum Euclidean point-to-surface distance:
 
 $$
 \mathrm{ASSD} = \frac{1}{2}\left(\frac{1}{\lvert \partial P \rvert}\sum_{p \in \partial P} d(p, \partial G) + \frac{1}{\lvert \partial G \rvert}\sum_{g \in \partial G} d(g, \partial P)\right)
@@ -309,14 +367,14 @@ python evaluate.py \
 
 ---
 
-## 5. 📜 Release and citation
+## 6. 📜 Release and citation
 
 ### 🎁 What is released
 
 <table>
 <tr><td width="80" align="center">⚖️<br><b>FairPE</b></td><td>
 
-The preprocessed CTPA volumes and matched re-annotated PE reference segmentations for all **149 included cases** across CAD-PE, FUMPE and READ, produced under the unified protocol. https://zenodo.org/records/21338494 
+The preprocessed CTPA volumes and the matched harmonized PE reference segmentations for all **149 included cases** across CAD-PE, FUMPE and READ. https://zenodo.org/records/21259322
 
 </td></tr>
 <tr><td align="center">🧠<br><b>nnPE</b></td><td>
@@ -326,17 +384,15 @@ nnU-Net 3D ResEncL weights for the pooled (**ABC**) and three leave-one-dataset-
 </td></tr>
 <tr><td align="center">💻<br><b>Code</b></td><td>
 
-`pre_totalseg.py`, `evaluate.py`, and the reproduction scripts for the paper's tables and figures.
+`convert_public_pe_to_nifti.py`, `pre_totalseg.py`, `create_splits.py`, `evaluate.py`, and the reproduction scripts for the papers' tables and figures.
 
 </td></tr>
 </table>
 
-The source datasets are publicly released for research use under terms that permit redistribution and derivative works with attribution; that attribution requirement is why citing all three sources is mandatory.
-
 ### 📌 Citation requirements
 
 > [!IMPORTANT]
-> Because FairPE is a **derivative annotation layer** over existing public data, any use of the labels or the weights must cite **all three source datasets** in addition to this work.
+> Because FairPE is a **derivative annotation layer** over existing public data, any use of the labels or the weights should cite **all three source datasets** in addition to this work. FUMPE is released under CC BY 4.0 and its licence makes attribution mandatory; READ is released under CC0 and CAD-PE under the terms of IEEE DataPort, where citation is expected practice rather than a licence condition.
 
 <details>
 <summary>📚 <b>Source datasets</b> — CAD-PE, FUMPE, READ <i>(required)</i></summary>
@@ -346,7 +402,7 @@ The source datasets are publicly released for research use under terms that perm
   author = {Gonzalez Serrano, Germ{\'a}n},
   title  = {CAD-PE},
   year   = {2019},
-  publisher = {IEEE Dataport},
+  publisher = {IEEE DataPort},
   doi    = {10.21227/9bw7-6823}
 }
 
@@ -409,7 +465,7 @@ Use of `pre_totalseg.py` additionally requires citing **TotalSegmentator**; use 
   volume    = {15009},
   publisher = {Springer},
   year      = {2024},
-  note      = {arXiv:2404.09556}
+  doi       = {10.1007/978-3-031-72114-4_47}
 }
 ```
 
@@ -418,15 +474,17 @@ Use of `pre_totalseg.py` additionally requires citing **TotalSegmentator**; use 
 <details open>
 <summary>⭐ <b>This work</b></summary>
 
+The dataset and the evaluation study are reported in two independent papers. This block will be updated with their DOIs once they are published. Until then, please cite the preprint:
+
 ```bibtex
 @misc{sun2026modeleffectlabeleffect,
-      title={Model Effect or Label Effect? Refined Annotations and a Human-Referenced Benchmark for Pulmonary Embolism Segmentation}, 
+      title={Model Effect or Label Effect? Refined Annotations and a Human-Referenced Benchmark for Pulmonary Embolism Segmentation},
       author={Qihang Sun and Zhongxiao Liu and Bailiang Jian and Shenman Qiu and Jingyuan Wang and Lei Zhang and Lixiang Xie and Jiazhen Pan and Christian Wachinger},
       year={2026},
       eprint={2608.24486},
       archivePrefix={arXiv},
       primaryClass={eess.IV},
-      url={https://arxiv.org/abs/2608.24486}, 
+      url={https://arxiv.org/abs/2608.24486},
 }
 ```
 
@@ -437,7 +495,7 @@ Use of `pre_totalseg.py` additionally requires citing **TotalSegmentator**; use 
 | Component | Licence |
 |:---|:---|
 | 💻 Code | [MIT](https://opensource.org/licenses/MIT) |
-| ⚖️ Re-annotated labels & preprocessed volumes | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| ⚖️ Harmonized labels & preprocessed volumes | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
 
 Users remain bound by the terms of the three source datasets.
 
@@ -445,7 +503,7 @@ Users remain bound by the terms of the three source datasets.
 
 <div align="center">
 
-🔒 **All resources — labels, weights, splits, and code — will be made public after the paper is accepted.**
+🔒 **All resources — labels, weights, splits, and code — will be made public after the papers are accepted.**
 
 <sub>If you find PEBench useful, please consider giving the repository a ⭐</sub>
 
