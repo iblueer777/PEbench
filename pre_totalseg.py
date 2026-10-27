@@ -118,7 +118,10 @@ def run_totalsegmentator(input_file, output_dir):
             print(f"    Segmentation shape: {seg_data.shape}")
             print(f"    Label values: {np.unique(seg_data)}")
 
-            lung_labels = list(range(1, 11))
+            # Look them up by name so the selection follows the installed version.
+            from totalsegmentator.map_to_binary import class_map
+            lung_labels = [k for k, name in class_map["total"].items() if name.startswith("lung_")]
+            print(f"    Lung lobe labels: {lung_labels}")
             lung_mask = np.isin(seg_data, lung_labels)
 
             if not lung_mask.any():
