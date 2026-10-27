@@ -478,7 +478,7 @@ The dataset and the evaluation study are reported in two independent papers. Thi
 
 ```bibtex
 @misc{sun2026modeleffectlabeleffect,
-      title={Model Effect or Label Effect? Refined Annotations and a Human-Referenced Benchmark for Pulmonary Embolism Segmentation},
+      title={Unified-protocol voxel-level pulmonary embolism annotations for three public CT angiography datasets},
       author={Qihang Sun and Zhongxiao Liu and Bailiang Jian and Shenman Qiu and Jingyuan Wang and Lei Zhang and Lixiang Xie and Jiazhen Pan and Christian Wachinger},
       year={2026},
       eprint={2608.24486},
